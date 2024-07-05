@@ -24,7 +24,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.time.format.DateTimeFormatter
 
 application {
-    mainClass = "org.broadinstitute.hellbender.Main"
+    mainClass = "com.example.Main"
     //Note: the test suite must use the same defaults. If you change system properties in this list you must also update the one in the test task
     applicationDefaultJvmArgs = ["-Dsamjdk.use_async_io_read_samtools=false", "-Dsamjdk.use_async_io_write_samtools=true", "-Dsamjdk.use_async_io_write_tribble=false", "-Dsamjdk.compression_level=2"]
 }
@@ -41,6 +41,14 @@ task downloadGsaLibFile(type: Download) {
     dest "src/main/resources/org/broadinstitute/hellbender/utils/R/gsalib.tar.gz"
     overwrite false
 }
+
+task runPythonScript(type: Exec) {
+    commandLine 'python3', 'recursive_class_transformer.py', './build/classes/java/main/org/broadinstitute/hellbender/tools/PrintReads.class', 'oblivious-java-compiler-1.0-SNAPSHOT.jar', './build/classes/java/main', './build/classes/java/main'
+    workingDir project.projectDir
+}
+
+compileJava.finalizedBy runPythonScript
+run.dependsOn runPythonScript
 
 
 repositories {
